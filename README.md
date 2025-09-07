@@ -10,9 +10,12 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 - **🤖 Interactive Creation**: Guided 5-phase workflow for building agents
 - **📦 Dual Output**: Create Claude Code subagents AND portable web packages
+- **💬 Freeform Input**: Accept voice dictation, unstructured thoughts, and "word vomit"
+- **🌐 Platform Awareness**: Research-backed optimization for ChatGPT, Gemini, NotebookLM, etc.
+- **📋 Structured Templates**: Professional 8-section format for consistency and quality
+- **✏️ Agent Editing**: Modify and improve existing agents with safety-first workflows
 - **✅ Built-in Validation**: Ensure quality and avoid conflicts
-- **📚 Rich Templates**: Professional templates for both formats
-- **🔧 Supporting Tools**: Validation and installation specialists
+- **🔧 Supporting Tools**: Validation, installation, and editing specialists
 
 ## Quick Start
 
@@ -55,11 +58,13 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
    **What gets installed:**
    - `agent-builder.md` - Main interactive agent creation specialist
+   - `agent-editor.md` - Agent modification and improvement specialist
    - `agent-validator.md` - Agent validation and quality checking
    - `agent-installer.md` - Installation and deployment management
 
 ### Usage
 
+**Creating New Agents:**
 In Claude Code, simply say either:
 ```
 I want to create an agent for [specific purpose]
@@ -69,13 +74,25 @@ or
 I want to create a subagent for [specific purpose]
 ```
 
-The agent-builder will automatically activate and guide you through the 5-phase creation process to build your new subagent. Both phrases work the same way - use whichever feels more natural to you.
+The agent-builder will automatically activate and guide you through the 5-phase creation process. It accepts freeform input - feel free to use voice dictation, unstructured thoughts, or rough ideas.
+
+**Editing Existing Agents:**
+To modify existing agents, say:
+```
+I want to edit the [agent-name] agent
+```
+or
+```
+Help me improve the [agent-name] subagent
+```
+
+The agent-editor will analyze the current agent and guide you through safe modifications with automatic backups.
 
 **Example trigger phrases:**
 - "I want to create an agent for API documentation"
 - "I want to create a subagent for code reviews"
-- "Help me create an agent that handles database migrations"
-- "I need to create a subagent for security analysis"
+- "Help me edit the api-docs agent to handle GraphQL"
+- "I need to improve the security-analyzer subagent"
 
 ## The 5-Phase Creation Process
 
@@ -108,7 +125,7 @@ The agent-builder will automatically activate and guide you through the 5-phase 
 ## Output Formats
 
 ### Claude Code Subagent
-Simple, clean format with YAML frontmatter:
+Structured format with YAML frontmatter and 8-section layout:
 ```yaml
 ---
 name: agent-name
@@ -116,7 +133,29 @@ description: Clear description for automatic invocation
 tools: Read, Write, Edit, Bash
 ---
 
-Focused system prompt optimized for Claude Code...
+## Role
+What the agent is
+
+## Task
+What it does
+
+## Context
+When/why it's used
+
+## Audience
+Who uses it
+
+## Key Information/Constraints
+Important limitations/requirements
+
+## Tone/Style
+How it communicates
+
+## Format
+Output structure expectations
+
+## Goal/Objective
+Success criteria
 ```
 
 ### Portable Agent Package
@@ -132,6 +171,7 @@ agent-name-portable/
 ## Available Subagents
 
 - **agent-builder**: Interactive subagent creation specialist (main subagent)
+- **agent-editor**: Specialized agent modification and improvement specialist
 - **agent-validator**: Structure and quality validation
 - **agent-installer**: Installation and deployment management
 
