@@ -60,12 +60,22 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 ### Usage
 
-In Claude Code, simply say:
+In Claude Code, simply say either:
+```
+I want to create an agent for [specific purpose]
+```
+or
 ```
 I want to create a subagent for [specific purpose]
 ```
 
-The agent-builder will automatically activate and guide you through the 5-phase creation process to build your new subagent.
+The agent-builder will automatically activate and guide you through the 5-phase creation process to build your new subagent. Both phrases work the same way - use whichever feels more natural to you.
+
+**Example trigger phrases:**
+- "I want to create an agent for API documentation"
+- "I want to create a subagent for code reviews"
+- "Help me create an agent that handles database migrations"
+- "I need to create a subagent for security analysis"
 
 ## The 5-Phase Creation Process
 
