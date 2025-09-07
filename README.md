@@ -20,27 +20,52 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 1. **Clone this repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/YoungLeadersDotTech/agent-builder.git
    cd agent-builder
    ```
 
-2. **For Claude Code users**:
-   ```bash
-   # Copy agents to your project
-   cp -r .claude/agents/* /path/to/your/project/.claude/agents/
+2. **Install the Agent Builder system**:
    
-   # Or install globally for all projects
-   cp -r .claude/agents/* ~/.claude/agents/
+   The Agent Builder includes three core subagents that work together to help you create new agents. You need to install these subagents into your Claude Code environment:
+
+   **Option A: Install for current project only**
+   ```bash
+   # Run the installation script for your current project
+   ./scripts/install.sh --project
    ```
+   This copies the agent-builder subagents to `.claude/agents/` in your current project.
+
+   **Option B: Install globally for all projects**
+   ```bash
+   # Run the installation script globally
+   ./scripts/install.sh --global
+   ```
+   This copies the agent-builder subagents to `~/.claude/agents/` so they're available in all your Claude Code projects.
+
+   **Option C: Manual installation**
+   ```bash
+   # For current project
+   mkdir -p .claude/agents
+   cp .claude/agents/* /path/to/your/claude-project/.claude/agents/
+   
+   # For global installation
+   mkdir -p ~/.claude/agents
+   cp .claude/agents/* ~/.claude/agents/
+   ```
+
+   **What gets installed:**
+   - `agent-builder.md` - Main interactive agent creation specialist
+   - `agent-validator.md` - Agent validation and quality checking
+   - `agent-installer.md` - Installation and deployment management
 
 ### Usage
 
 In Claude Code, simply say:
 ```
-I want to create an agent for [specific purpose]
+I want to create a subagent for [specific purpose]
 ```
 
-The agent-builder will automatically activate and guide you through the 5-phase creation process.
+The agent-builder will automatically activate and guide you through the 5-phase creation process to build your new subagent.
 
 ## The 5-Phase Creation Process
 
@@ -60,7 +85,7 @@ The agent-builder will automatically activate and guide you through the 5-phase 
 - Establish clear differentiation from other agents
 
 ### Phase 4: Deployment Strategy (**NEW**)
-**Critical Question**: "Where will this agent be used?"
+**Critical Question**: "Where will this subagent be used?"
 - **Claude Code only**: Standard subagent format
 - **Web platforms**: Portable package for Gemini, NotebookLM, etc.
 - **Both**: Dual output for maximum flexibility
@@ -94,9 +119,9 @@ agent-name-portable/
 └── README.md               # Setup instructions
 ```
 
-## Available Agents
+## Available Subagents
 
-- **agent-builder**: Interactive agent creation specialist (main agent)
+- **agent-builder**: Interactive subagent creation specialist (main subagent)
 - **agent-validator**: Structure and quality validation
 - **agent-installer**: Installation and deployment management
 
