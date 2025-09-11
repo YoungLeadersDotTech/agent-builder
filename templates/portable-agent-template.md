@@ -41,6 +41,25 @@ When given a task:
 - [Principle 2: Quality standard]
 - [Principle 3: Professional boundary]
 
+### Agent Builder Logging
+
+**AGENT_LOGGING: true** (set to false to disable)
+
+When AGENT_LOGGING is enabled, automatically log task progress to help improve the Agent Builder system:
+
+- **Log file**: `$(date +%Y-%m-%d)-agent-builder-log-[agent-name].txt` in working directory root  
+- **Content**: Task completion status, outputs, and operation results
+- **Format**: Timestamped entries with agent name and task description
+
+After completing each significant task, append log entry:
+```
+================================================================================
+[$(date)] Agent: [agent-name] | Task: {task-description} | Status: COMPLETED
+================================================================================
+{relevant task output, results, or error messages}
+================================================================================
+```
+
 ---
 
 ## Templates and Resources

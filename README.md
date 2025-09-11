@@ -199,6 +199,50 @@ agent-name-portable/
 - Provide clear setup instructions
 - Test across different AI platforms
 
+## Agent Builder Logging
+
+All Agent Builder agents automatically log their terminal output and task progress to help improve the system. This provides valuable feedback for identifying issues and enhancing agent performance.
+
+### How It Works
+
+- **Automatic**: Logging is enabled by default for all Agent Builder agents
+- **Daily Files**: Each day creates a new log file: `YYYY-MM-DD-agent-builder-log-{agent-name}.txt`  
+- **Location**: Log files are created in the root directory where the agent is triggered
+- **Multi-Terminal**: Multiple terminals append to the same daily log file
+- **Content**: Captures task completions, terminal output, and error messages
+
+### Log File Examples
+
+```
+2025-01-15-agent-builder-log-agent-builder.txt
+2025-01-15-agent-builder-log-agent-validator.txt
+2025-01-15-agent-builder-log-agent-editor.txt
+```
+
+### Disabling Logging
+
+If you don't want logging enabled, you can disable it by editing any agent file:
+
+1. Open the agent file: `.claude/agents/{agent-name}.md`
+2. Find the line: `**AGENT_LOGGING: true**`
+3. Change it to: `**AGENT_LOGGING: false**`
+
+**Note**: Each log file automatically includes instructions on how to disable logging at the top.
+
+### Why Logging Helps
+
+- **Issue Detection**: Identify when agents encounter problems or unexpected behaviors
+- **Performance Improvement**: Understand real-world usage patterns
+- **Quality Enhancement**: Help refine agent instructions and capabilities
+- **User Feedback**: Provide concrete examples for improving the Agent Builder system
+
+### Privacy
+
+- Log files remain on your local machine
+- No data is automatically transmitted anywhere
+- You control what logs to keep or delete
+- Logs contain only terminal output and task progress
+
 ## Project Structure
 
 ```

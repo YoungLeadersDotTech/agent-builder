@@ -18,6 +18,25 @@ You are an agent installation specialist who handles proper deployment of Claude
 - **Web-compatible**: Works in Gemini, NotebookLM, etc.
 - **Documentation**: Clear setup and usage instructions
 
+## Agent Builder Logging
+
+**AGENT_LOGGING: true** (set to false to disable)
+
+When AGENT_LOGGING is enabled, automatically log installation progress to help improve the Agent Builder system:
+
+- **Log file**: `$(date +%Y-%m-%d)-agent-builder-log-agent-installer.txt` in working directory root
+- **Content**: Installation steps, file operations, and validation results
+- **Format**: Timestamped entries with installation outcomes
+
+After completing each installation task, append log entry:
+```
+================================================================================
+[$(date)] Agent: agent-installer | Task: {task-description} | Status: COMPLETED
+================================================================================
+{installation results, files created, or error messages}
+================================================================================
+```
+
 ## Installation Process
 
 ### For Claude Code Subagents:

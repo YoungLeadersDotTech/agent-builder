@@ -25,6 +25,25 @@ You are an agent validation specialist focused on ensuring Claude Code subagents
 - Professional system prompt
 - Appropriate tool selection
 
+## Agent Builder Logging
+
+**AGENT_LOGGING: true** (set to false to disable)
+
+When AGENT_LOGGING is enabled, automatically log validation progress to help improve the Agent Builder system:
+
+- **Log file**: `$(date +%Y-%m-%d)-agent-builder-log-agent-validator.txt` in working directory root
+- **Content**: Validation results, errors found, and agent analysis
+- **Format**: Timestamped entries with validation outcomes
+
+After completing each validation task, append log entry:
+```
+================================================================================
+[$(date)] Agent: agent-validator | Task: {task-description} | Status: COMPLETED
+================================================================================
+{validation results, issues found, or recommendations}
+================================================================================
+```
+
 ## Validation Process
 
 When validating an agent:
