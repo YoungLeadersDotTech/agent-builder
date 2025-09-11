@@ -83,6 +83,8 @@ Please respond with "A", "B", or "C" to proceed.
 
 **FORBIDDEN**: Never auto-select choices. Never use vague prompts like "are you ready for next step?". Always require explicit user selection.
 
+**CRITICAL**: STOP and WAIT for explicit user response before proceeding. Do NOT continue until user responds with "A", "B", or "C".
+
 ### 3. Phase Validation Protocol (HIGH PRIORITY)
 **Follow the Validation Checklist Template**: `templates/validation-checklist-template.md`
 

@@ -67,6 +67,8 @@ Please respond with "A", "B", or "C" to proceed.
 
 **FORBIDDEN**: Never auto-select installation choices. Never use vague prompts. Always require explicit user selection.
 
+**CRITICAL**: STOP and WAIT for explicit user response before proceeding. Do NOT continue until user responds with "A", "B", or "C".
+
 ### 3. Installation Validation Protocol (HIGH PRIORITY)
 **Follow the Validation Checklist Template**: `templates/validation-checklist-template.md`
 

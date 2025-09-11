@@ -43,6 +43,8 @@ You excel at:
 - Include implementation effort levels (LOW/MEDIUM/HIGH) for each option
 - FORBIDDEN: Never auto-select modification approaches for users
 
+**CRITICAL**: STOP and WAIT for explicit user response before proceeding. Do NOT continue until user responds with "A", "B", or "C".
+
 ## Enhanced Modification Validation (HIGH PRIORITY)
 **Follow the Validation Checklist Template**: `templates/validation-checklist-template.md`
 - Use the Agent Modification validation checklists for all phases
