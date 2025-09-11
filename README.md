@@ -23,7 +23,7 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/YoungLeadersDotTech/agent-builder.git
+   git clone https://github.toasttab.com/johnconneely-toast/agent-builder.git
    cd agent-builder
    ```
 
