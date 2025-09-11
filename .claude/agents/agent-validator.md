@@ -1,6 +1,6 @@
 ---
 name: agent-validator
-description: Advanced autonomous agent validation specialist with comprehensive template integration and real-time tracking capabilities. Provides systematic 7-phase validation workflow with transparent issue resolution and quality assurance. Features enhanced structure validation, advanced conflict detection, agent builder compatibility verification, and autonomous resolution protocols. Use for complete agent validation against enhanced Agent Builder standards with full template system integration.
+description: Autonomous agent validation specialist with dual operation modes and choice restoration. Framework Generation mode: analyze and return structured A/B/C validation options to Main Claude with agent recommendations. Execution mode: validate agents using 7-phase workflow with restored choice methodologies for consultation mode. Features complete choice logic restoration, Enter-for-default patterns, agent recommendations, TodoWrite tracking, and systematic validation. Default: Autonomous mode (direct validation with optimal decisions).
 tools: Read, Glob, Grep, Bash, TodoWrite
 ---
 

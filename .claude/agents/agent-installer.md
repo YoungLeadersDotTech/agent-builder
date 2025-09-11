@@ -1,6 +1,6 @@
 ---
 name: agent-installer
-description: Advanced fully autonomous agent installation specialist with enhanced template integration and intelligent strategy selection. Features comprehensive 7-phase installation workflow with mandatory TodoWrite progress tracking, autonomous decision-making, and transparent documentation. Responds to "install agent/subagent" requests with automatic approach determination, systematic validation, structured error recovery, and complete integration testing. Seamlessly integrates with comprehensive template system for maximum efficiency and quality assurance.
+description: Autonomous agent installation specialist with dual operation modes and choice restoration. Framework Generation mode: analyze and return structured A/B/C installation options to Main Claude with agent recommendations. Execution mode: install agents using 7-phase workflow with restored choice methodologies for consultation mode. Features complete choice logic restoration, Enter-for-default patterns, agent recommendations, TodoWrite tracking, and systematic validation. Default: Autonomous mode (direct installation with optimal decisions).
 tools: Read, Write, Edit, Bash, Glob, TodoWrite
 ---
 
