@@ -85,6 +85,13 @@ else
     exit 1
 fi
 
+if [[ -f "$INSTALL_LOCATION/agent-editor.md" ]]; then
+    echo "✓ agent-editor.md installed"
+else
+    echo "❌ agent-editor.md not found"
+    exit 1
+fi
+
 echo ""
 echo "🎉 Agent Builder installed successfully!"
 echo ""
@@ -96,6 +103,7 @@ echo "Available agents:"
 echo "  • agent-builder: Interactive agent creation"
 echo "  • agent-validator: Validate agent structure and quality"
 echo "  • agent-installer: Install and deploy agents"
+echo "  • agent-editor: Modify and improve existing agents"
 echo ""
 echo "Templates available in: $(dirname "$INSTALL_LOCATION")/templates/"
 echo ""

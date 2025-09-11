@@ -34,14 +34,14 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
    **Option A: Install for current project only**
    ```bash
    # Run the installation script for your current project
-   ./scripts/install.sh --project
+   ./scripts/agent-builder-install.sh --project
    ```
    This copies the agent-builder subagents to `.claude/agents/` in your current project.
 
    **Option B: Install globally for all projects**
    ```bash
    # Run the installation script globally
-   ./scripts/install.sh --global
+   ./scripts/agent-builder-install.sh --global
    ```
    This copies the agent-builder subagents to `~/.claude/agents/` so they're available in all your Claude Code projects.
 
