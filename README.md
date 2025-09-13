@@ -17,13 +17,23 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 - **✅ Built-in Validation**: Ensure quality and avoid conflicts
 - **🔧 Supporting Tools**: Validation, installation, and editing specialists
 
+## ⚠️ Important: Installation Best Practices
+
+**ALWAYS install agents globally when developing/testing:**
+```bash
+cd created-agents/agent-builder
+./install.sh --global  # Recommended for development
+```
+
+**Never install in the same project where you're developing agents!** This creates confusion with duplicate files. See [PUBLISHING.md](PUBLISHING.md) for the complete workflow guide.
+
 ## Quick Start
 
 ### Installation
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/youngleadersdottech/agent-builder.git
+   git clone https://github.com/YoungLeadersDotTech/agent-builder.git
    cd agent-builder
    ```
 
@@ -60,7 +70,7 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
    - `agent-builder.md` - Main interactive agent creation specialist
    - `agent-editor.md` - Agent modification and improvement specialist
    - `agent-validator.md` - Agent validation and quality checking
-   - `agent-installer.md` - Installation and deployment management
+   - `agent-packager.md` - Bundle packaging and distribution management
 
 ### Usage
 
@@ -173,7 +183,7 @@ agent-name-portable/
 - **agent-builder**: Interactive subagent creation specialist (main subagent)
 - **agent-editor**: Specialized agent modification and improvement specialist
 - **agent-validator**: Structure and quality validation
-- **agent-installer**: Installation and deployment management
+- **agent-packager**: Bundle packaging and distribution management
 
 ## Examples
 
@@ -248,12 +258,23 @@ If you don't want logging enabled, you can disable it by editing any agent file:
 ```
 agent-builder/
 ├── .claude/
-│   └── agents/              # Claude Code subagents
+│   └── agents/              # Source agents (commit these)
+├── created-agents/          # Development bundles (gitignored)
 ├── templates/               # Agent templates
 ├── examples/                # Example implementations
 ├── docs/                    # Additional documentation
+│   ├── INSTALLATION_WORKFLOW.md  # Installation design
+│   └── PUBLISHING.md        # Publishing guide
 └── scripts/                 # Installation utilities
 ```
+
+## Development Workflow
+
+See [PUBLISHING.md](PUBLISHING.md) for the complete guide on:
+- Creating and testing agents without pollution
+- Proper directory structure
+- Publishing and distribution strategies
+- Common mistakes to avoid
 
 ## Advanced Usage
 

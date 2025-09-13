@@ -11,7 +11,7 @@ This repository contains the Agent Builder toolkit - an interactive system for c
 - **`.claude/agents/`**: Core agent builder system
   - `agent-builder.md` - Main interactive agent creation specialist
   - `agent-validator.md` - Agent validation and quality checking
-  - `agent-installer.md` - Installation and deployment management
+  - `agent-packager.md` - Bundle packaging and distribution management
 
 - **`templates/`**: Templates for both output formats
   - `claude-subagent-template.md` - Claude Code subagent format

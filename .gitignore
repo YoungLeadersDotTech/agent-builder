@@ -37,5 +37,15 @@ __pycache__/
 portable-agents/*/
 .agent-builder-temp/
 
+# Development bundles (not for distribution)
+created-agents/
+!created-agents/.gitkeep
+
+# Installed agents (user-specific)
+.claude/
+
+# Keep only source agents if you have them
+!.claude/agents/*.md
+
 # User-specific Claude Code settings
 .claude/settings.local.json

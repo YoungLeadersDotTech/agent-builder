@@ -1,116 +1,65 @@
 #!/bin/bash
 set -euo pipefail
 
-# Agent Builder Installation Script
-# Installs agent builder system to Claude Code projects
+# Agent Builder Bundle Installation Script
+# Uses the self-contained bundle architecture for installation
 
-echo "Agent Builder Installation"
-echo "========================="
+echo "Agent Builder Bundle Installation"
+echo "=================================="
 
-# Check if Claude Code is available
-if ! command -v claude &> /dev/null; then
-    echo "⚠️  Claude Code CLI not found. This toolkit works best with Claude Code."
-    echo "   You can still use the portable agents on other platforms."
-fi
+# Get the script's directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Determine installation location
-INSTALL_LOCATION=""
-GLOBAL_FLAG=""
+# Check if bundle exists
+BUNDLE_DIR="$REPO_ROOT/created-agents/agent-builder"
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --global)
-            GLOBAL_FLAG="--global"
-            INSTALL_LOCATION="$HOME/.claude/agents"
-            echo "📁 Installing globally to $INSTALL_LOCATION"
-            shift
-            ;;
-        --project)
-            INSTALL_LOCATION="$(pwd)/.claude/agents"
-            echo "📁 Installing to current project: $INSTALL_LOCATION"
-            shift
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [--global|--project]"
-            exit 1
-            ;;
-    esac
-done
-
-# Default to project installation if no flag specified
-if [[ -z "$INSTALL_LOCATION" ]]; then
-    INSTALL_LOCATION="$(pwd)/.claude/agents"
-    echo "📁 Installing to current project: $INSTALL_LOCATION"
-fi
-
-# Create installation directory
-mkdir -p "$INSTALL_LOCATION"
-
-# Copy agent files
-echo "📦 Installing agent builder system..."
-cp -r .claude/agents/* "$INSTALL_LOCATION/"
-
-# Copy templates if they don't exist
-TEMPLATE_LOCATION="$(dirname "$INSTALL_LOCATION")/templates"
-if [[ ! -d "$TEMPLATE_LOCATION" ]]; then
-    echo "📋 Installing templates..."
-    mkdir -p "$TEMPLATE_LOCATION"
-    cp -r templates/* "$TEMPLATE_LOCATION/"
-else
-    echo "📋 Templates directory exists, skipping..."
-fi
-
-# Verify installation
-echo "✅ Verifying installation..."
-if [[ -f "$INSTALL_LOCATION/agent-builder.md" ]]; then
-    echo "✓ agent-builder.md installed"
-else
-    echo "❌ agent-builder.md not found"
+if [[ ! -d "$BUNDLE_DIR" ]]; then
+    echo "❌ Bundle not found at: $BUNDLE_DIR"
+    echo ""
+    echo "The agent-builder bundle needs to be created first."
+    echo "This should have been done automatically during setup."
+    echo ""
+    echo "To create the bundle manually:"
+    echo "1. Use agent-builder to create the agent-builder agent"
+    echo "2. Validate it with agent-validator"
+    echo "3. Package it with agent-packager"
+    echo ""
     exit 1
 fi
 
-if [[ -f "$INSTALL_LOCATION/agent-validator.md" ]]; then
-    echo "✓ agent-validator.md installed"
-else
-    echo "❌ agent-validator.md not found"
+# Check if bundle has install script
+if [[ ! -f "$BUNDLE_DIR/install.sh" ]]; then
+    echo "❌ Bundle install.sh not found at: $BUNDLE_DIR/install.sh"
+    echo "The bundle appears to be incomplete."
     exit 1
 fi
 
-if [[ -f "$INSTALL_LOCATION/agent-installer.md" ]]; then
-    echo "✓ agent-installer.md installed"
+# Make install script executable
+chmod +x "$BUNDLE_DIR/install.sh"
+
+# Forward all arguments to the bundle's install script
+echo "📦 Using bundle installation at: $BUNDLE_DIR"
+echo ""
+
+cd "$BUNDLE_DIR"
+./install.sh "$@"
+
+# Check exit code
+if [[ $? -eq 0 ]]; then
+    echo ""
+    echo "🎉 Agent Builder successfully installed from bundle!"
+    echo ""
+    echo "Bundle Details:"
+    if [[ -f "$BUNDLE_DIR/MANIFEST.json" ]]; then
+        echo "  • Version: $(grep -o '"version": "[^"]*"' MANIFEST.json | cut -d'"' -f4)"
+        echo "  • Agents: $(grep -c '"name"' MANIFEST.json | head -1) included"
+        echo "  • Templates: $(grep -o '"templates": \[.*\]' MANIFEST.json | grep -o '"' | wc -l | awk '{print $1/2}')"
+    fi
+    echo ""
+    echo "The bundle architecture ensures all dependencies are included"
+    echo "and properly versioned for consistent installation."
 else
-    echo "❌ agent-installer.md not found"
+    echo "❌ Installation failed. Please check the error messages above."
     exit 1
-fi
-
-if [[ -f "$INSTALL_LOCATION/agent-editor.md" ]]; then
-    echo "✓ agent-editor.md installed"
-else
-    echo "❌ agent-editor.md not found"
-    exit 1
-fi
-
-echo ""
-echo "🎉 Agent Builder installed successfully!"
-echo ""
-echo "Usage:"
-echo "  In Claude Code, say: 'I want to create an agent for [purpose]'"
-echo "  The agent-builder will automatically activate and guide you."
-echo ""
-echo "Available agents:"
-echo "  • agent-builder: Interactive agent creation"
-echo "  • agent-validator: Validate agent structure and quality"
-echo "  • agent-installer: Install and deploy agents"
-echo "  • agent-editor: Modify and improve existing agents"
-echo ""
-echo "Templates available in: $(dirname "$INSTALL_LOCATION")/templates/"
-echo ""
-
-if [[ -n "$GLOBAL_FLAG" ]]; then
-    echo "ℹ️  Global installation complete. These agents will be available in all Claude Code projects."
-else
-    echo "ℹ️  Project installation complete. These agents are available in this project only."
-    echo "   Use --global flag to install for all projects."
 fi

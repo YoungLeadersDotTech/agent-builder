@@ -284,14 +284,41 @@ After completing each TodoWrite task, append log entry:
 
 **User Confirmation Required**: Explicit A/B/C selection to proceed
 
-#### Phase 4: Agent File Generation & Structure Validation
-**TodoWrite Task**: "Generate and validate complete agent file structure"
+#### Phase 4: Agent File Generation & Bundle Creation
+**TodoWrite Task**: "Generate and validate complete agent file structure with bundle"
 
-**File Generation Process**:
-1. **Template Selection**: Choose appropriate base template
-2. **Content Integration**: Merge specification into template structure
-3. **Syntax Validation**: Ensure YAML frontmatter and markdown correctness
-4. **Completeness Check**: Verify all required sections present
+**Enhanced Bundle Generation Process**:
+1. **Create Bundle Directory Structure**:
+   ```
+   created-agents/{agent-name}/
+   ├── agents/           # Agent files
+   ├── templates/        # Required templates only
+   ├── examples/         # If referenced
+   ├── docs/            # Documentation
+   ├── install.sh       # Smart installer
+   ├── README.md        # Auto-generated
+   ├── VERSION          # 1.0.0 initial
+   └── MANIFEST.json    # Bundle metadata
+   ```
+
+2. **Template Dependency Detection** (analyze agent for template references):
+   - Scan for `templates/*.md` patterns
+   - Detect "Follow the X Template" references
+   - Identify direct template file paths
+   - Copy ONLY required templates to bundle
+
+3. **Agent File Generation**:
+   - Choose appropriate base template
+   - Merge specification into template structure
+   - Save to `created-agents/{agent-name}/agents/{agent-name}.md`
+   - Ensure YAML frontmatter and markdown correctness
+
+4. **Bundle Component Creation**:
+   - Generate smart `install.sh` with selective options
+   - Create auto-generated `README.md` from YAML metadata
+   - Initialize `VERSION` file (1.0.0)
+   - Build `MANIFEST.json` with dependencies and metadata
+   - Copy relevant examples if referenced in agent
 
 **Output Format Options** (present using A/B/C choice format):
 **Option A**: Claude Code Subagent
@@ -349,18 +376,90 @@ Final Validation:
 === AGENT CREATION COMPLETION ===
 
 ✓ Agent successfully created with all specifications
+✓ Bundle directory structure created at created-agents/{agent-name}/
+✓ Template dependencies detected and copied (only required templates)
+✓ Smart installer script generated with selective options
+✓ README auto-generated from agent metadata
+✓ MANIFEST.json created with complete bundle inventory
 ✓ Quality validation passed comprehensively
-✓ Testing completed successfully
-✓ Documentation generated automatically
 ✓ Ready for immediate deployment and use
 
+Bundle Location: created-agents/{agent-name}/
 Agent Name: {agent-name}
 Purpose: {agent-purpose}
 Format: {chosen-format}
 Tools: {tool-selection}
+Templates Included: {list of detected template dependencies}
 
-Agent creation completed successfully. Ready for installation or deployment.
+Agent bundle created successfully. Ready for distribution or installation.
 ```
+
+## Auto-Triggering Next Agent
+
+**AUTOMATIC NEXT STEP**: After successful agent creation, automatically trigger validation:
+
+```
+=== TRIGGERING AGENT-VALIDATOR ===
+
+The newly created agent needs validation. I'll now invoke the agent-validator to ensure quality and compatibility.
+
+Invoking: validate-agent {agent-file-path}
+```
+
+**Trigger Phrases for Manual Invocation**:
+- "validate this agent"
+- "check agent quality"
+- "run agent-validator on {agent-name}"
+
+## Template Dependency Detection
+
+**AUTOMATIC TEMPLATE ANALYSIS**: When creating bundles, agent-builder automatically detects which templates are actually referenced:
+
+### Detection Patterns
+The system scans agent content for:
+1. **Direct Template Paths**: `templates/*.md` references
+2. **Follow Directives**: "Follow the X Template" or "**Follow the X Template**"
+3. **Template Mentions**: References to specific template files in instructions
+4. **Tool-Specific Templates**: TodoWrite Integration Template, Validation Checklist Template, etc.
+
+### Implementation Logic
+```python
+# Pseudo-code for template dependency detection
+def detect_template_dependencies(agent_content):
+    templates_found = set()
+
+    # Pattern 1: Direct template file paths
+    # Matches: templates/todowrite-integration-template.md
+    direct_paths = re.findall(r'templates/([^/\s]+\.md)', agent_content)
+    templates_found.update(direct_paths)
+
+    # Pattern 2: Follow the X Template patterns
+    # Matches: "Follow the TodoWrite Integration Template"
+    follow_patterns = re.findall(r'Follow the ([^"]+) Template', agent_content)
+    for pattern in follow_patterns:
+        template_name = pattern.lower().replace(' ', '-') + '-template.md'
+        templates_found.add(template_name)
+
+    # Pattern 3: Bolded follow patterns
+    # Matches: **Follow the Validation Checklist Template**
+    bold_patterns = re.findall(r'\*\*Follow the ([^*]+) Template\*\*', agent_content)
+    for pattern in bold_patterns:
+        template_name = pattern.lower().replace(' ', '-') + '-template.md'
+        templates_found.add(template_name)
+
+    return list(templates_found)
+
+# Only copy detected templates to bundle
+detected_templates = detect_template_dependencies(agent_content)
+for template in detected_templates:
+    copy_template_to_bundle(template, bundle_path)
+```
+
+### Benefits
+- **Reduced Bundle Size**: Only includes necessary templates
+- **Clear Dependencies**: MANIFEST.json lists exactly which templates are needed
+- **Portable Bundles**: Self-contained with all required resources
+- **No Missing Dependencies**: Validation ensures all referenced templates exist
 
 ## Enhanced Templates Integration
 
