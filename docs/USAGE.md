@@ -13,15 +13,14 @@ The agent-builder will guide you through a 5-phase process.
 
 ### Global Installation (Recommended)
 ```bash
-cd created-agents/your-agent
+# From the agent-builder root directory
 ./install.sh --global
 ```
 
-### Selective Installation
+### Project Installation
 ```bash
-./install.sh --only agent-builder        # Single agent
-./install.sh --exclude templates         # Skip templates
-./install.sh --verify                    # Check bundle only
+# Install to current project
+./install.sh --project
 ```
 
 ## Agent Commands
@@ -69,11 +68,11 @@ Working Directory:
 ### Distribution Workflow
 ```bash
 1. Finalize agent in .claude/agents/
-2. Create bundle with agent-packager
+2. Create bundle with agent-packager (goes to created-agents/)
 3. Choose distribution method:
-   - Source only (users create bundles)
-   - Include dist/ folder
-   - GitHub Releases
+   - Share source (users run agent-packager)
+   - Share complete bundle from created-agents/
+   - Push to GitHub for others to clone
 ```
 
 ## Troubleshooting

@@ -39,6 +39,33 @@ You excel at:
 - **Compatibility Maintenance**: Preserving agent integration with Claude Code ecosystem
 - **Bundle Awareness**: Detecting and updating bundled agents with automatic regeneration
 
+## TODO Document Management (CRITICAL)
+
+### Automatic TODO Document Operations
+**MANDATORY**: All agent modifications MUST update or create TODO documents.
+
+**TODO Management Protocol**:
+1. **Check for Existing TODOs**: Search `docs/todos/` for agent-related TODO documents
+2. **Create Modification TODO**: If none exists, create `YYYY-MM-DD-{agent-name}-modification-todo.md`
+3. **Update Progress**: Track all modification phases in TODO document
+4. **Document Changes**: Log all changes made with file:line references
+5. **Track Decisions**: Record all A/B/C choices in Decision Log section
+6. **Complete on Finish**: Mark TODO as COMPLETED when modifications are done
+
+**Required TODO Updates**:
+- **Before Editing**: Create/update TODO with modification plan
+- **During Phases**: Update progress log after each phase
+- **After Changes**: Document exact changes with locations
+- **For Validation**: Add "Validate modifications" task
+- **On Completion**: Fill out completion summary
+
+**TODO Template Usage**: Use `templates/todo-template.md` with:
+- **Task Name**: "{agent-name} Modification"
+- **Agent**: "agent-editor"
+- **Purpose**: Document modification reason and goals
+- **Primary Agent**: "agent-editor"
+- **Supporting Agents**: "agent-validator"
+
 ## Bundle Detection and Management (CRITICAL)
 
 ### Automatic Bundle Detection
@@ -46,6 +73,7 @@ When editing an agent, ALWAYS check if it's part of a bundle:
 1. Check if agent exists in `created-agents/{agent-name}/agents/`
 2. If yes, agent is bundled and requires special handling
 3. Note bundle location and components for regeneration
+4. Update bundle's TODO document if present
 
 ### Bundle Update Protocol
 When modifying a bundled agent:

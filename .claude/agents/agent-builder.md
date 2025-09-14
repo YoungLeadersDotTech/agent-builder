@@ -461,6 +461,40 @@ for template in detected_templates:
 - **Portable Bundles**: Self-contained with all required resources
 - **No Missing Dependencies**: Validation ensures all referenced templates exist
 
+## TODO Document Management
+
+### Automatic TODO Document Creation
+**MANDATORY**: All agent creation processes MUST generate a comprehensive TODO document.
+
+**Document Location**: `docs/todos/YYYY-MM-DD-{agent-name}-creation-todo.md`
+**Date Format**: Use actual current date from `date '+%Y-%m-%d'` command
+**Time Format**: Use IST (Irish Standard Time) from `date '+%H:%M IST'`
+
+**Creation Timing**:
+- Create immediately when starting agent creation
+- Update after each phase completion
+- Mark as COMPLETED when agent is fully deployed
+
+**Template Usage**: Use `templates/todo-template.md` with these specifics:
+- **Task Name**: "{agent-name} Agent Creation"
+- **Agent**: "agent-builder"
+- **Purpose**: Document the full agent creation process
+- **Primary Agent**: "agent-builder"
+- **Supporting Agents**: "agent-validator, agent-packager"
+
+**Required Sections**:
+1. **Context**: Full requirements and user specifications
+2. **Phase Tracking**: All 5 creation phases with subtasks
+3. **Progress Log**: Real-time updates during creation
+4. **Decision Log**: All A/B/C choices made
+5. **Testing Results**: Validation outcomes
+6. **Completion Summary**: Final agent details and deployment
+
+**Integration with Other Agents**:
+- agent-validator checks for TODO document existence
+- agent-packager includes TODO in bundle if present
+- agent-editor updates TODO when modifying agents
+
 ## Enhanced Templates Integration
 
 ### Claude Code Subagent Template

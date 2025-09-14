@@ -21,7 +21,6 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 **ALWAYS install agents globally when developing/testing:**
 ```bash
-cd created-agents/agent-builder
 ./install.sh --global  # Recommended for development
 ```
 
@@ -44,14 +43,14 @@ cd created-agents/agent-builder
    **Option A: Install for current project only**
    ```bash
    # Run the installation script for your current project
-   ./scripts/agent-builder-install.sh --project
+   ./install.sh --project
    ```
    This copies the agent-builder subagents to `.claude/agents/` in your current project.
 
    **Option B: Install globally for all projects**
    ```bash
    # Run the installation script globally
-   ./scripts/agent-builder-install.sh --global
+   ./install.sh --global
    ```
    This copies the agent-builder subagents to `~/.claude/agents/` so they're available in all your Claude Code projects.
 
@@ -59,18 +58,21 @@ cd created-agents/agent-builder
    ```bash
    # For current project
    mkdir -p .claude/agents
-   cp .claude/agents/* /path/to/your/claude-project/.claude/agents/
+   cp .claude/agents/*.md .claude/agents/
+   cp templates/*.md .claude/templates/
    
    # For global installation
    mkdir -p ~/.claude/agents
-   cp .claude/agents/* ~/.claude/agents/
+   cp .claude/agents/*.md ~/.claude/agents/
+   cp templates/*.md ~/.claude/templates/
    ```
 
    **What gets installed:**
-   - `agent-builder.md` - Main interactive agent creation specialist
-   - `agent-editor.md` - Agent modification and improvement specialist
-   - `agent-validator.md` - Agent validation and quality checking
-   - `agent-packager.md` - Bundle packaging and distribution management
+   - `agent-builder.md` - Main interactive agent creation specialist with TODO management
+   - `agent-editor.md` - Agent modification specialist and primary TODO handler
+   - `agent-validator.md` - Agent validation with template cross-reference checking
+   - `agent-packager.md` - Bundle packaging with bidirectional sync for your created agents
+   - All supporting templates including the new TODO management system
 
 ### Usage
 

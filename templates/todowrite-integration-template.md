@@ -13,11 +13,19 @@ This template provides the standard TodoWrite integration protocols that should 
 
 **Requirements**:
 - **MUST** create comprehensive initial todo list before starting any complex operation
+- **MUST** create persistent TODO document using `templates/todo-template.md` for tracking
 - **MUST** update todo status after completing each major step or phase
 - **MUST** mark exactly ONE task as "in_progress" at any time
 - **MUST** add new discovered tasks during process execution
 - **CANNOT** advance to next phase without completing current todo item
 - **CANNOT** declare process "complete" without all todos marked completed
+
+**Persistent TODO Document**:
+- Create in `docs/todos/YYYY-MM-DD-{task-name}-todo.md`
+- Use `templates/todo-template.md` for structure
+- Update with progress, decisions, and blockers
+- Include file:line references for all changes
+- Use IST (Irish Standard Time) for timestamps
 
 **Initial Todo Template** (create immediately when user requests complex operation):
 ```
@@ -95,6 +103,24 @@ Example for Agent Installation:
 **Task Description Format**:
 - `content`: Imperative form ("Complete Phase 1", "Validate syntax")
 - `activeForm`: Present continuous form ("Completing Phase 1", "Validating syntax")
+
+### Integration with Persistent TODO Documents:
+
+**Two-Layer TODO System**:
+1. **TodoWrite Tool**: Claude's built-in task tracking (ephemeral, session-based)
+2. **TODO Documents**: Persistent markdown files for comprehensive tracking
+
+**How They Work Together**:
+- TodoWrite tracks immediate tasks during the session
+- TODO Documents preserve context across sessions
+- Both should be updated in parallel
+- TODO Documents capture more detail (decisions, blockers, file:line refs)
+
+**When Session Ends/Restarts**:
+1. Check `docs/todos/` for existing TODO documents
+2. Resume from documented progress
+3. Recreate TodoWrite list from pending tasks in TODO document
+4. Continue updating both systems
 
 ### Integration with Agent Builder Logging:
 
