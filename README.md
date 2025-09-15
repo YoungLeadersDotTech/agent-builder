@@ -68,7 +68,8 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
    ```
 
    **What gets installed:**
-   - `agent-builder.md` - Main interactive agent creation specialist with TODO management
+   - `agent-builder-context.md` - Primary entry point for all agent workflows with intelligent routing
+   - `agent-builder.md` - Interactive agent creation specialist with TODO management
    - `agent-editor.md` - Agent modification specialist and primary TODO handler
    - `agent-validator.md` - Agent validation with template cross-reference checking
    - `agent-packager.md` - Bundle packaging with bidirectional sync for your created agents
@@ -76,35 +77,50 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 ### Usage
 
+**Primary Entry Point (Recommended):**
+In Claude Code, use the agent-builder-context as your main entry point:
+```
+I want to work with agents for [specific purpose]
+```
+or
+```
+Help me with agent [creation/editing/validation/packaging]
+```
+
+The agent-builder-context will intelligently analyze your request and route you to the appropriate specialist agent while gathering comprehensive context.
+
+**Direct Agent Access (Also Supported):**
+You can still access agents directly for specific tasks:
+
 **Creating New Agents:**
-In Claude Code, simply say either:
 ```
 I want to create an agent for [specific purpose]
 ```
-or
-```
-I want to create a subagent for [specific purpose]
-```
-
-The agent-builder will automatically activate and guide you through the 5-phase creation process. It accepts freeform input - feel free to use voice dictation, unstructured thoughts, or rough ideas.
+The agent-builder will guide you through the 5-phase creation process.
 
 **Editing Existing Agents:**
-To modify existing agents, say:
 ```
 I want to edit the [agent-name] agent
 ```
-or
-```
-Help me improve the [agent-name] subagent
-```
+The agent-editor will analyze and guide you through safe modifications.
 
-The agent-editor will analyze the current agent and guide you through safe modifications with automatic backups.
+**Validating Agents:**
+```
+I want to validate my agent
+```
+The agent-validator will perform comprehensive quality checks.
+
+**Packaging Agents:**
+```
+I want to package my agent for distribution
+```
+The agent-packager will create distributable bundles.
 
 **Example trigger phrases:**
-- "I want to create an agent for API documentation"
-- "I want to create a subagent for code reviews"
-- "Help me edit the api-docs agent to handle GraphQL"
-- "I need to improve the security-analyzer subagent"
+- "I want to work with agents for API documentation" (context routing)
+- "I want to create an agent for code reviews" (direct creation)
+- "Help me edit the api-docs agent to handle GraphQL" (direct editing)
+- "I need to validate my security-analyzer agent" (direct validation)
 
 ## The 5-Phase Creation Process
 
@@ -182,7 +198,8 @@ agent-name-portable/
 
 ## Available Subagents
 
-- **agent-builder**: Interactive subagent creation specialist (main subagent)
+- **agent-builder-context**: Primary entry point with intelligent routing and context gathering
+- **agent-builder**: Interactive subagent creation specialist (main creation agent)
 - **agent-editor**: Specialized agent modification and improvement specialist
 - **agent-validator**: Structure and quality validation
 - **agent-packager**: Bundle packaging and distribution management

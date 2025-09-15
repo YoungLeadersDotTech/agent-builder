@@ -191,6 +191,13 @@ After completing each TodoWrite task, append log entry:
 
 **MANDATORY**: Use this structured 5-phase workflow with TodoWrite tracking for ALL agent creation.
 
+### Context Gathering Integration (NEW)
+**When invoked by agent-builder-context**:
+- Receive comprehensive context from `docs/agent-context.md`
+- Use pre-identified templates from context analysis
+- Apply template recommendations automatically
+- Maintain context throughout creation process
+
 ### Phase-by-Phase Creation Process
 
 #### Phase 1: Requirements Analysis & Scope Definition
@@ -256,12 +263,29 @@ After completing each TodoWrite task, append log entry:
 #### Phase 3: System Prompt Development
 **TodoWrite Task**: "Create comprehensive system prompt with behavioral patterns"
 
+**AUTOMATIC TEMPLATE APPLICATION** (NEW):
+Before creating the system prompt, automatically:
+1. **Scan `/templates/` directory** for all available templates
+2. **Analyze requirements** to identify applicable templates:
+   - Complex tasks → Apply `todowrite-integration-template.md`
+   - User decisions → Apply `structured-choice-template.md`
+   - Quality needs → Apply `validation-checklist-template.md`
+   - Agent behavior → Apply `proactive-behavior-template.md`
+   - Multi-agent → Apply `agent-coordination-template.md`
+   - Standard ops → Apply `operational-protocols-template.md`
+3. **Include template references** in generated agent with:
+   ```markdown
+   **Follow the [Template Name] Template**: `templates/[template-file].md`
+   ```
+4. **Document template usage** in agent metadata and MANIFEST.json
+
 **System Prompt Components**:
 1. **Core Identity**: Who the agent is and primary purpose
 2. **Behavioral Patterns**: How the agent operates and interacts
-3. **Operational Protocols**: Mandatory behaviors and constraints
+3. **Operational Protocols**: Mandatory behaviors and constraints (with template references)
 4. **Quality Standards**: Success criteria and validation requirements
 5. **Error Handling**: Recovery procedures and fallback behaviors
+6. **Template Integration**: References to applicable templates from `/templates/`
 
 **Behavioral Style Options** (present using A/B/C choice format):
 **Option A**: Autonomous Professional

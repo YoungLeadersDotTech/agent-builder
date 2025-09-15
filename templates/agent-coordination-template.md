@@ -5,10 +5,18 @@ Defines how agents trigger and communicate with each other to ensure seamless wo
 
 ## Agent Roles (No Overlap)
 
+### agent-builder-context
+**Primary Role**: Entry point with intelligent routing and context gathering
+**Triggers**:
+- User says: "I want to work with agents", "help me with agent [task]"
+- Routes to appropriate specialist based on request analysis
+**Triggers Next**: agent-builder, agent-editor, agent-validator, or agent-packager (based on routing analysis)
+
 ### agent-builder
 **Primary Role**: Creates new agents from user requirements
 **Triggers**:
-- User says: "create an agent", "build an agent", "I need an agent for..."
+- Via agent-builder-context routing for creation requests
+- Direct user requests: "create an agent", "build an agent", "I need an agent for..."
 - Outputs: New agent file(s) in workspace
 **Triggers Next**: agent-validator (automatically after creation)
 
@@ -31,7 +39,8 @@ Defines how agents trigger and communicate with each other to ensure seamless wo
 ### agent-editor
 **Primary Role**: Modifies and improves existing agents
 **Triggers**:
-- User says: "edit this agent", "improve", "update", "fix"
+- Via agent-builder-context routing for modification requests
+- Direct user requests: "edit this agent", "improve", "update", "fix"
 - Validation fails and fixes are needed
 - Bundle needs updating with new features
 **Triggers Next**: agent-validator (after edits complete)
@@ -125,11 +134,15 @@ on_todo_complete:
 
 ```mermaid
 graph LR
-    User[User Request] --> Builder[agent-builder]
-    Builder --> Validator[agent-validator]
-    Validator -->|Pass| Packager[agent-packager]
-    Validator -->|Fail| Editor[agent-editor]
+    User[User Request] --> Context[agent-builder-context]
+    Context -->|Create| Builder[agent-builder]
+    Context -->|Edit| Editor[agent-editor]
+    Context -->|Validate| Validator[agent-validator]
+    Context -->|Package| Packager[agent-packager]
+    Builder --> Validator
     Editor --> Validator
+    Validator -->|Pass| Packager
+    Validator -->|Fail| Editor
     Packager --> Complete[Bundle Ready]
 ```
 

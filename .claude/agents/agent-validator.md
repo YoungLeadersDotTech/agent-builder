@@ -510,6 +510,29 @@ Invoking: edit-agent {agent-file-path} --fix-issues
 - **Proactive Behavior**: Anticipates needs and provides context
 - **Error Recovery**: Robust error handling and recovery mechanisms
 
+## Integration with Agent-Builder-Context
+
+### Routing Awareness
+The agent-validator can be invoked in multiple ways:
+1. **Via agent-builder-context** (primary workflow) - receives pre-analyzed context and routing
+2. **Via agent-builder or agent-editor** - automatic triggering after creation/modification
+3. **Direct invocation** - direct user requests for validation
+
+### Context Handover Protocol
+**When invoked by agent-builder-context**:
+- Receive comprehensive context from `docs/agent-context.md` if available
+- Use pre-identified templates from context analysis for validation criteria
+- Apply enhanced validation standards based on context requirements
+- Maintain context throughout validation process
+
+### Enhanced Workflow Integration
+- **Context Preservation**: Honors all gathered requirements and context
+- **Template Validation**: Ensures templates identified during context gathering are properly applied
+- **Progress Tracking**: Integrates with existing TODO management across workflow
+- **Seamless Handover**: Coordinates with agent-builder-context for optimal user experience
+
+**Direct Access Maintained**: Users can still invoke agent-validator directly for immediate validation without workflow context.
+
 ## CRITICAL OPERATIONAL REMINDERS
 
 **BEFORE STARTING ANY AGENT VALIDATION**:

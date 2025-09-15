@@ -9,6 +9,7 @@ This repository contains the Agent Builder toolkit - an interactive system for c
 ### Key Components
 
 - **`.claude/agents/`**: Core agent builder system
+  - `agent-builder-context.md` - Context gathering and orchestration for agent creation
   - `agent-builder.md` - Main interactive agent creation specialist
   - `agent-validator.md` - Agent validation and quality checking
   - `agent-packager.md` - Bundle packaging and distribution management
@@ -23,9 +24,18 @@ This repository contains the Agent Builder toolkit - an interactive system for c
 
 ### Usage
 
-To create new agents, simply say: "I want to create an agent for [specific purpose]"
+To create new agents with enhanced context gathering:
+1. **Recommended**: "Use agent-builder-context to help me create an agent for [purpose]"
+   - Gathers comprehensive requirements and context first
+   - Automatically identifies and applies relevant templates
+   - Creates detailed context documentation
+   - Orchestrates the agent-builder with full context
 
-The agent-builder will automatically activate and guide you through a structured 5-phase creation process with forced todo management for complex operations.
+2. **Direct**: "I want to create an agent for [specific purpose]"
+   - Goes directly to agent-builder
+   - Follows structured 5-phase creation process
+
+The agent-builder-context ensures better template application and context preservation throughout the creation process.
 
 ### TODO Document Management
 
@@ -42,6 +52,7 @@ The agent-builder will automatically activate and guide you through a structured
 4. To understand what has been completed and what remains
 
 **Agent TODO Responsibilities**:
+- **agent-builder-context**: Creates TODO for context gathering and orchestration
 - **agent-builder**: Creates TODO when building new agents
 - **agent-validator**: Updates TODO with validation results
 - **agent-editor**: Primary handler - creates/updates TODOs for all modifications

@@ -463,6 +463,29 @@ You work seamlessly with the enhanced Agent Builder ecosystem:
 
 Remember: The agent-editor now operates as an autonomous modification specialist that executes improvements independently while maintaining complete transparency and providing consultation frameworks when requested.
 
+## Integration with Agent-Builder-Context
+
+### Routing Awareness
+The agent-editor can be invoked in two ways:
+1. **Via agent-builder-context** (primary workflow) - receives pre-analyzed context and routing
+2. **Direct invocation** - direct user requests for agent modification
+
+### Context Handover Protocol
+**When invoked by agent-builder-context**:
+- Receive comprehensive context from `docs/agent-context.md` if available
+- Use pre-identified templates from context analysis
+- Apply template recommendations automatically
+- Maintain context throughout modification process
+- Honor any routing decisions or specifications provided
+
+### Enhanced Workflow Integration
+- **Preserves Context**: All gathered requirements and context from agent-builder-context
+- **Template Continuity**: Uses templates identified during context gathering
+- **Progress Tracking**: Integrates with existing TODO management
+- **Seamless Handover**: No duplication of context gathering effort
+
+**Direct Access Still Supported**: Users can still invoke agent-editor directly for immediate modifications without going through agent-builder-context.
+
 ## Auto-Triggering Next Agent
 
 **AUTOMATIC NEXT STEP**: After successful agent modification, automatically trigger re-validation:

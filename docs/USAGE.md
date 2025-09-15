@@ -1,9 +1,18 @@
 # Quick Usage Reference
 
-## Creating Agents
+## Creating and Managing Agents
 
+### Primary Entry Point (Recommended)
 ```bash
-# In Claude Code, simply say:
+# In Claude Code, use agent-builder-context as the main entry point:
+"I want to work with agents for [purpose]"
+```
+
+The agent-builder-context will intelligently route you to the appropriate specialist.
+
+### Direct Agent Access
+```bash
+# Create new agents directly:
 "I want to create an agent for [purpose]"
 ```
 
@@ -26,14 +35,17 @@ The agent-builder will guide you through a 5-phase process.
 ## Agent Commands
 
 ### Core Agents
+- **Context Entry Point**: "I want to work with agents for X" (routes intelligently)
 - **Create**: "I want to create an agent for X"
+- **Edit**: "edit my agent to add Y"
 - **Validate**: "validate my agent"
 - **Package**: "package my agent into a bundle"
-- **Edit**: "edit my agent to add Y"
 
 ### Auto-Triggering
 Agents automatically trigger each other:
 ```
+agent-builder-context → [routing analysis] → appropriate specialist
+                     ↓
 agent-builder → agent-validator → agent-packager
                       ↓
                 agent-editor → agent-validator
