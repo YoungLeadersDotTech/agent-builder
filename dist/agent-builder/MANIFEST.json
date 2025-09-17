@@ -1,0 +1,79 @@
+{
+  "bundle_name": "Agent Builder",
+  "version": "2.2.0",
+  "created": "2025-01-15",
+  "updated": "2025-01-15",
+  "agents": [
+    {
+      "name": "agent-builder-context",
+      "description": "Context gathering and orchestration for agent workflows",
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "TodoWrite", "WebSearch"],
+      "triggers_next": "agent-builder | agent-editor | agent-validator | agent-packager"
+    },
+    {
+      "name": "agent-builder",
+      "description": "Interactive agent creation specialist with template auto-application",
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "TodoWrite", "WebSearch"],
+      "triggers_next": "agent-validator"
+    },
+    {
+      "name": "agent-editor",
+      "description": "Agent modification and improvement specialist",
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep", "TodoWrite"],
+      "triggers_next": "agent-validator"
+    },
+    {
+      "name": "agent-validator",
+      "description": "Agent structure and quality validation",
+      "tools": ["Read", "Glob", "Grep", "Bash", "TodoWrite"],
+      "triggers_next": "agent-packager"
+    },
+    {
+      "name": "agent-packager",
+      "description": "Self-contained bundle creation with correct install script template",
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "TodoWrite"],
+      "triggers_next": null
+    }
+  ],
+  "templates": [
+    "agent-coordination-template.md",
+    "todowrite-integration-template.md",
+    "structured-choice-template.md",
+    "validation-checklist-template.md",
+    "agent-builder-logging-template.md",
+    "operational-protocols-template.md",
+    "proactive-behavior-template.md",
+    "claude-subagent-template.md",
+    "portable-agent-template.md"
+  ],
+  "examples": [
+    "sample-subagent.md",
+    "sample-portable-agent/"
+  ],
+  "dependencies": {
+    "claude_code_version": ">=1.0.0",
+    "required_tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "TodoWrite", "WebSearch"]
+  },
+  "installation": {
+    "supports_global": true,
+    "supports_project": true,
+    "supports_selective": true,
+    "default_mode": "project"
+  },
+  "validation": {
+    "templates_referenced": 9,
+    "templates_included": 9,
+    "agents_defined": 5,
+    "agents_included": 5,
+    "status": "COMPLETE"
+  },
+  "changelog": {
+    "2.2.0": [
+      "Added agent-builder-context for improved context gathering and orchestration",
+      "Enhanced agent-builder with automatic template application",
+      "Fixed agent-packager to use correct install-script-template.sh",
+      "Added intelligent routing between all agents",
+      "Improved workflow with better handover from Main Claude"
+    ]
+  }
+}

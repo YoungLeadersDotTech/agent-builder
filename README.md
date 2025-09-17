@@ -38,33 +38,32 @@ Agent Builder is a sophisticated toolkit that helps you create high-quality AI a
 
 2. **Install the Agent Builder system**:
    
-   The Agent Builder includes three core subagents that work together to help you create new agents. You need to install these subagents into your Claude Code environment:
+   The Agent Builder includes five core subagents that work together to help you create new agents. Install them from the official distribution bundle:
 
-   **Option A: Install for current project only**
+   **Option A: Install globally for all projects (recommended)**
    ```bash
-   # Run the installation script for your current project
-   ./install.sh --project
-   ```
-   This copies the agent-builder subagents to `.claude/agents/` in your current project.
-
-   **Option B: Install globally for all projects**
-   ```bash
-   # Run the installation script globally
+   # Navigate to the distribution bundle and install globally
+   cd dist/agent-builder
    ./install.sh --global
    ```
-   This copies the agent-builder subagents to `~/.claude/agents/` so they're available in all your Claude Code projects.
+   This installs the agent-builder subagents to `~/.claude/agents/` so they're available in all your Claude Code projects.
 
-   **Option C: Manual installation**
+   **Option B: Install for current project only**
    ```bash
-   # For current project
-   mkdir -p .claude/agents
-   cp .claude/agents/*.md .claude/agents/
-   cp templates/*.md .claude/templates/
-   
-   # For global installation
-   mkdir -p ~/.claude/agents
-   cp .claude/agents/*.md ~/.claude/agents/
-   cp templates/*.md ~/.claude/templates/
+   # Navigate to the distribution bundle and install locally
+   cd dist/agent-builder
+   ./install.sh --project
+   ```
+   This installs the agent-builder subagents to `.claude/agents/` in your current project.
+
+   **Option C: Check version status before installing**
+   ```bash
+   # Check what versions are currently installed
+   cd dist/agent-builder
+   ./install.sh --check-versions
+
+   # Then install with appropriate option
+   ./install.sh --global  # or --project
    ```
 
    **What gets installed:**
