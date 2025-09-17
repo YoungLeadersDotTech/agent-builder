@@ -1,575 +1,423 @@
 #!/bin/bash
+# Install Script Template for Agent Bundles
+#
+# This template provides the standard structure for agent bundle installation scripts.
+# The agent-packager should generate install.sh files following this template pattern.
+#
+# Key Features:
+# - Bidirectional sync capabilities (--sync-back, --check-versions)
+# - Version conflict detection with timestamp comparison
+# - Global/project installation modes
+# - Bundle information display from MANIFEST.json
+# - Colored output and professional UX
+# - Safety checks and confirmation prompts
 
-# Agent Builder - Simplified Installation Script
-# Installs agents and templates directly from source files
-# Single source of truth: .claude/agents/ and templates/
+set -euo pipefail
 
-set -e
+# ============================================================================
+# CONFIGURATION SECTION
+# ============================================================================
 
-# Colors for output
+# Bundle metadata (populate from MANIFEST.json during generation)
+BUNDLE_NAME="Agent Builder"
+BUNDLE_VERSION="2.2.0"
+BUNDLE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Components to install (populate from bundle contents)
+declare -a AGENTS=(
+    "agent-builder-context:Context gathering and orchestration for agent workflows"
+    "agent-builder:Interactive agent creation specialist with template auto-application"
+    "agent-editor:Agent modification and improvement specialist"
+    "agent-validator:Agent structure and quality validation"
+    "agent-packager:Self-contained bundle creation with correct install script template"
+)
+
+declare -a TEMPLATES=(
+    # List all templates included in bundle
+    "agent-coordination-template.md"
+    "todowrite-integration-template.md"
+    "structured-choice-template.md"
+    "validation-checklist-template.md"
+    "agent-builder-logging-template.md"
+    "operational-protocols-template.md"
+    "proactive-behavior-template.md"
+    "claude-subagent-template.md"
+    "portable-agent-template.md"
+)
+
+# ============================================================================
+# COLOR CONFIGURATION
+# ============================================================================
+
+# Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-# Default installation mode and flags
-INSTALL_MODE=""
-CHECK_VERSIONS=false
-FORCE_INSTALL=false
-
-# Help function
-show_help() {
-    echo "Agent Builder Installation Script"
-    echo ""
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "Installation Options:"
-    echo "  --global         Install agents globally for system-wide access"
-    echo "  --project        Install agents in current project's .claude/agents/"
-    echo ""
-    echo "Version Control Options:"
-    echo "  --check-versions Show version comparison without installing"
-    echo "  --force          Force installation, overriding version warnings"
-    echo ""
-    echo "Other Options:"
-    echo "  --help, -h       Show this help message"
-    echo ""
-    echo "Examples:"
-    echo "  $0 --global                    # Install globally (with version check)"
-    echo "  $0 --project --force           # Force project installation"
-    echo "  $0 --check-versions --global   # Check global versions without installing"
-    echo ""
-    echo "If no installation option is specified, you'll be prompted to choose."
+# Function to print colored output
+print_color() {
+    echo -e "${2}${1}${NC}"
 }
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --global)
-            INSTALL_MODE="global"
-            shift
-            ;;
-        --project)
-            INSTALL_MODE="project"
-            shift
-            ;;
-        --check-versions)
-            CHECK_VERSIONS=true
-            shift
-            ;;
-        --force)
-            FORCE_INSTALL=true
-            shift
-            ;;
-        --help|-h)
-            show_help
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}Unknown option: $1${NC}"
-            show_help
-            exit 1
-            ;;
-    esac
-done
+# ============================================================================
+# BUNDLE INFORMATION DISPLAY
+# ============================================================================
 
-# Function to prompt for installation mode if not specified
-prompt_install_mode() {
-    if [[ -z "$INSTALL_MODE" ]]; then
-        local mode_purpose="installation"
-        if [[ "$CHECK_VERSIONS" == true ]]; then
-            mode_purpose="version check"
-        fi
+# Display bundle details from MANIFEST.json
+display_bundle_info() {
+    echo ""
+    print_color "📦 Bundle Information:" "$CYAN"
+    if [[ -f "$BUNDLE_DIR/MANIFEST.json" ]]; then
+        local version=$(grep -o '"version": "[^"]*"' "$BUNDLE_DIR/MANIFEST.json" | cut -d'"' -f4)
+        local agent_count=$(grep -c '"name"' "$BUNDLE_DIR/MANIFEST.json" | head -1)
+        local template_count=$(grep -o '"templates": \[.*\]' "$BUNDLE_DIR/MANIFEST.json" | grep -o '"' | wc -l | awk '{print $1/2}')
 
-        echo -e "${BLUE}Agent Builder - Choose Target for $mode_purpose${NC}"
-        echo ""
-        echo "Choose target mode:"
-        echo "1) Global (system-wide Claude Code directory)"
-        echo "2) Project (current project's .claude directory)"
-        echo ""
-        read -p "Enter choice (1 or 2): " choice
-
-        case $choice in
-            1)
-                INSTALL_MODE="global"
-                ;;
-            2)
-                INSTALL_MODE="project"
-                ;;
-            *)
-                echo -e "${RED}Invalid choice. Please run the script again.${NC}"
-                exit 1
-                ;;
-        esac
-    fi
-}
-
-# Function to get target directory based on installation mode
-get_target_directory() {
-    if [[ "$INSTALL_MODE" == "global" ]]; then
-        # Global installation - use Claude Code's global directory
-        echo "$HOME/.claude"
+        echo "  • Version: $version"
+        echo "  • Agents: $agent_count included"
+        echo "  • Templates: $template_count"
     else
-        # Project installation - use current directory's .claude
-        echo "$(pwd)/.claude"
+        echo "  • Version: $BUNDLE_VERSION (MANIFEST.json not found)"
     fi
+    echo ""
 }
 
-# Function to get file modification time (cross-platform)
-get_file_mtime() {
+# ============================================================================
+# VERSION COMPARISON FUNCTIONS
+# ============================================================================
+
+# Get file modification time (cross-platform)
+get_file_time() {
     local file="$1"
     if [[ ! -f "$file" ]]; then
         echo "0"
         return
     fi
 
-    # Use stat command (works on both Linux and macOS)
-    if stat -c %Y "$file" 2>/dev/null; then
-        # Linux version
-        return
-    elif stat -f %m "$file" 2>/dev/null; then
-        # macOS version
-        return
-    else
-        # Fallback: use ls and rough estimation
-        echo "1"
-    fi
+    # Try GNU stat first (Linux), then BSD stat (macOS)
+    stat -c "%Y" "$file" 2>/dev/null || stat -f "%m" "$file" 2>/dev/null || echo "0"
 }
 
-# Function to compare file versions
-compare_file_versions() {
-    local source_file="$1"
-    local target_file="$2"
+# Compare versions between bundle and installed
+compare_versions() {
+    local bundle_file="$1"
+    local installed_file="$2"
 
-    local source_time=$(get_file_mtime "$source_file")
-    local target_time=$(get_file_mtime "$target_file")
+    if [[ ! -f "$bundle_file" ]]; then
+        echo "missing_source"
+        return
+    fi
 
-    if [[ ! -f "$target_file" ]]; then
+    if [[ ! -f "$installed_file" ]]; then
         echo "new"
-    elif [[ "$source_time" -gt "$target_time" ]]; then
+        return
+    fi
+
+    local bundle_time=$(get_file_time "$bundle_file")
+    local installed_time=$(get_file_time "$installed_file")
+
+    if [[ $bundle_time -gt $installed_time ]]; then
         echo "newer"
-    elif [[ "$source_time" -lt "$target_time" ]]; then
+    elif [[ $installed_time -gt $bundle_time ]]; then
         echo "older"
     else
         echo "same"
     fi
 }
 
-# Function to format file timestamp for display
-format_timestamp() {
-    local file="$1"
-    if [[ ! -f "$file" ]]; then
-        echo "not found"
-        return
+# ============================================================================
+# SYNC-BACK FUNCTIONS
+# ============================================================================
+
+# Sync changes from installed location back to bundle
+sync_back_to_bundle() {
+    print_color "🔄 Syncing changes back to bundle..." "$YELLOW"
+    local sync_count=0
+    local skip_count=0
+
+    # Sync agents
+    for agent_info in "${AGENTS[@]}"; do
+        IFS=':' read -r agent_name agent_desc <<< "$agent_info"
+        local bundle_agent="$BUNDLE_DIR/agents/${agent_name}.md"
+        local installed_agent="$TARGET_DIR/agents/${agent_name}.md"
+
+        if [[ -f "$installed_agent" ]]; then
+            local status=$(compare_versions "$bundle_agent" "$installed_agent")
+
+            case "$status" in
+                "older")
+                    print_color "  ← Syncing $agent_name (installed is newer)" "$GREEN"
+                    cp "$installed_agent" "$bundle_agent"
+                    ((sync_count++))
+                    ;;
+                "newer")
+                    print_color "  ↷ Skipping $agent_name (bundle is newer)" "$YELLOW"
+                    ((skip_count++))
+                    ;;
+                "same")
+                    [[ "$VERBOSE" == true ]] && print_color "  = $agent_name (already in sync)" "$BLUE"
+                    ;;
+            esac
+        else
+            print_color "  ✗ $agent_name not found in installation" "$RED"
+        fi
+    done
+
+    # Sync templates if they exist
+    if [[ ${#TEMPLATES[@]} -gt 0 ]]; then
+        for template in "${TEMPLATES[@]}"; do
+            local bundle_template="$BUNDLE_DIR/templates/$template"
+            local installed_template="$TARGET_DIR/templates/$template"
+
+            if [[ -f "$installed_template" ]]; then
+                local status=$(compare_versions "$bundle_template" "$installed_template")
+
+                case "$status" in
+                    "older")
+                        print_color "  ← Syncing template $template" "$GREEN"
+                        cp "$installed_template" "$bundle_template"
+                        ((sync_count++))
+                        ;;
+                    "newer")
+                        [[ "$VERBOSE" == true ]] && print_color "  ↷ Skipping template $template" "$YELLOW"
+                        ((skip_count++))
+                        ;;
+                esac
+            fi
+        done
     fi
 
-    # Use ls -l for human-readable timestamp
-    ls -l "$file" | awk '{print $6, $7, $8}'
+    echo ""
+    print_color "✅ Sync complete: $sync_count files updated, $skip_count skipped" "$GREEN"
 }
 
-# Function to check versions of all files
-check_all_versions() {
-    local source_dir="$1"
-    local target_dir="$2"
+# ============================================================================
+# CHECK VERSIONS MODE
+# ============================================================================
 
-    echo -e "${BLUE}Version Comparison Report${NC}"
-    echo -e "${YELLOW}Source: $source_dir${NC}"
-    echo -e "${YELLOW}Target: $target_dir${NC}"
+# Check and report version status without making changes
+check_versions() {
+    display_bundle_info
+
+    print_color "📊 Version Status Report" "$CYAN"
+    print_color "========================" "$CYAN"
     echo ""
 
-    local has_conflicts=false
-    local update_count=0
+    local newer_count=0
+    local older_count=0
     local same_count=0
     local new_count=0
 
     # Check agents
-    echo -e "${BLUE}Agents (.claude/agents/*.md):${NC}"
-    local agents_dir="$source_dir/.claude/agents"
-    local target_agents_dir="$target_dir/agents"
+    for agent_info in "${AGENTS[@]}"; do
+        IFS=':' read -r agent_name agent_desc <<< "$agent_info"
+        local bundle_agent="$BUNDLE_DIR/agents/${agent_name}.md"
+        local installed_agent="$TARGET_DIR/agents/${agent_name}.md"
+        local status=$(compare_versions "$bundle_agent" "$installed_agent")
 
-    if [[ -d "$agents_dir" ]]; then
-        for source_file in "$agents_dir"/*.md; do
-            if [[ -f "$source_file" ]]; then
-                local filename=$(basename "$source_file")
-                local target_file="$target_agents_dir/$filename"
-                local status=$(compare_file_versions "$source_file" "$target_file")
-
-                case "$status" in
-                    "new")
-                        echo -e "  ${GREEN}+ $filename${NC} (new file)"
-                        new_count=$((new_count + 1))
-                        ;;
-                    "newer")
-                        echo -e "  ${YELLOW}↑ $filename${NC} (source newer - will update)"
-                        echo -e "    Source: $(format_timestamp "$source_file")"
-                        echo -e "    Target: $(format_timestamp "$target_file")"
-                        update_count=$((update_count + 1))
-                        ;;
-                    "older")
-                        echo -e "  ${RED}⚠ $filename${NC} (target newer - will overwrite!)"
-                        echo -e "    Source: $(format_timestamp "$source_file")"
-                        echo -e "    Target: $(format_timestamp "$target_file")"
-                        has_conflicts=true
-                        update_count=$((update_count + 1))
-                        ;;
-                    "same")
-                        echo -e "  ${GREEN}= $filename${NC} (same version)"
-                        same_count=$((same_count + 1))
-                        ;;
-                esac
-            fi
-        done
-    fi
+        echo -n "$agent_name: "
+        case "$status" in
+            "newer")
+                print_color "Bundle is NEWER ↑" "$YELLOW"
+                ((newer_count++))
+                ;;
+            "older")
+                print_color "Installed is NEWER ⚠️" "$RED"
+                ((older_count++))
+                ;;
+            "same")
+                print_color "In sync ✓" "$GREEN"
+                ((same_count++))
+                ;;
+            "new")
+                print_color "Not installed +" "$BLUE"
+                ((new_count++))
+                ;;
+        esac
+    done
 
     echo ""
+    echo "Summary:"
+    [[ $new_count -gt 0 ]] && echo "  • $new_count new files to install"
+    [[ $newer_count -gt 0 ]] && echo "  • $newer_count files to update (bundle newer)"
+    [[ $older_count -gt 0 ]] && print_color "  • $older_count files where installed is newer" "$YELLOW"
+    [[ $same_count -gt 0 ]] && echo "  • $same_count files already in sync"
 
-    # Check templates
-    echo -e "${BLUE}Templates (templates/*.md):${NC}"
-    local templates_dir="$source_dir/templates"
-    local target_templates_dir="$target_dir/templates"
-
-    if [[ -d "$templates_dir" ]]; then
-        for source_file in "$templates_dir"/*.md; do
-            if [[ -f "$source_file" ]]; then
-                local filename=$(basename "$source_file")
-                local target_file="$target_templates_dir/$filename"
-                local status=$(compare_file_versions "$source_file" "$target_file")
-
-                case "$status" in
-                    "new")
-                        echo -e "  ${GREEN}+ $filename${NC} (new file)"
-                        new_count=$((new_count + 1))
-                        ;;
-                    "newer")
-                        echo -e "  ${YELLOW}↑ $filename${NC} (source newer - will update)"
-                        echo -e "    Source: $(format_timestamp "$source_file")"
-                        echo -e "    Target: $(format_timestamp "$target_file")"
-                        update_count=$((update_count + 1))
-                        ;;
-                    "older")
-                        echo -e "  ${RED}⚠ $filename${NC} (target newer - will overwrite!)"
-                        echo -e "    Source: $(format_timestamp "$source_file")"
-                        echo -e "    Target: $(format_timestamp "$target_file")"
-                        has_conflicts=true
-                        update_count=$((update_count + 1))
-                        ;;
-                    "same")
-                        echo -e "  ${GREEN}= $filename${NC} (same version)"
-                        same_count=$((same_count + 1))
-                        ;;
-                esac
-            fi
-        done
-    fi
-
-    echo ""
-    echo -e "${BLUE}Summary:${NC}"
-    echo -e "  New files: $new_count"
-    echo -e "  Files to update: $update_count"
-    echo -e "  Files unchanged: $same_count"
-
-    if [[ "$has_conflicts" == true ]]; then
+    if [[ $older_count -gt 0 ]]; then
         echo ""
-        echo -e "${RED}⚠ WARNING: Some installed files are newer than source files!${NC}"
-        echo -e "${RED}Installing will overwrite your newer installed versions.${NC}"
-        echo -e "${YELLOW}Use --force to override this warning, or update your source files first.${NC}"
-        return 1
-    fi
-
-    return 0
-}
-
-# Function to create directory if it doesn't exist
-create_directory() {
-    local dir="$1"
-    if [[ ! -d "$dir" ]]; then
-        echo -e "${BLUE}Creating directory: $dir${NC}"
-        mkdir -p "$dir"
+        print_color "⚠️  Some installed files are newer than bundle" "$YELLOW"
+        echo "   Use --sync-back to update bundle with installed changes"
     fi
 }
 
-# Function to copy agents with version checking
-copy_agents() {
-    local source_dir="$1/.claude/agents"
-    local target_dir="$2/agents"
+# ============================================================================
+# INSTALLATION FUNCTIONS
+# ============================================================================
 
-    echo -e "${BLUE}Installing agents...${NC}"
-    create_directory "$target_dir"
+# Install with version checking
+install_with_check() {
+    local force_install="${1:-false}"
 
-    # Count agents for progress feedback
-    local agent_count=$(find "$source_dir" -name "*.md" -type f | wc -l)
-    echo -e "${YELLOW}Found $agent_count agents to install${NC}"
+    # Check for version conflicts unless force is enabled
+    if [[ "$force_install" != "true" ]]; then
+        local conflicts=0
 
-    local updated_count=0
-    local skipped_count=0
+        for agent_info in "${AGENTS[@]}"; do
+            IFS=':' read -r agent_name agent_desc <<< "$agent_info"
+            local bundle_agent="$BUNDLE_DIR/agents/${agent_name}.md"
+            local installed_agent="$TARGET_DIR/agents/${agent_name}.md"
+            local status=$(compare_versions "$bundle_agent" "$installed_agent")
 
-    # Copy each agent file with version awareness
-    for agent_file in "$source_dir"/*.md; do
-        if [[ -f "$agent_file" ]]; then
-            local agent_name=$(basename "$agent_file")
-            local target_file="$target_dir/$agent_name"
-            local status=$(compare_file_versions "$agent_file" "$target_file")
+            if [[ "$status" == "older" ]]; then
+                print_color "⚠️  Warning: $agent_name installed version is newer" "$YELLOW"
+                ((conflicts++))
+            fi
+        done
 
-            case "$status" in
-                "new")
-                    echo -e "  ${GREEN}+ Installing new agent: $agent_name${NC}"
-                    cp "$agent_file" "$target_dir/"
-                    updated_count=$((updated_count + 1))
-                    ;;
-                "newer")
-                    echo -e "  ${YELLOW}↑ Updating agent: $agent_name${NC}"
-                    cp "$agent_file" "$target_dir/"
-                    updated_count=$((updated_count + 1))
-                    ;;
-                "older")
-                    if [[ "$FORCE_INSTALL" == true ]]; then
-                        echo -e "  ${RED}⚠ Force overwriting newer agent: $agent_name${NC}"
-                        cp "$agent_file" "$target_dir/"
-                        updated_count=$((updated_count + 1))
-                    else
-                        echo -e "  ${RED}⚠ Skipping older agent: $agent_name (target is newer)${NC}"
-                        skipped_count=$((skipped_count + 1))
-                    fi
-                    ;;
-                "same")
-                    echo -e "  ${GREEN}= Agent up to date: $agent_name${NC}"
-                    skipped_count=$((skipped_count + 1))
-                    ;;
-            esac
+        if [[ $conflicts -gt 0 ]]; then
+            echo ""
+            read -p "Overwrite newer installed files? [y/N] " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_color "Installation cancelled" "$YELLOW"
+                exit 0
+            fi
         fi
-    done
+    fi
 
-    echo -e "${GREEN}Agents processing complete! Updated: $updated_count, Skipped: $skipped_count${NC}"
+    # Proceed with installation
+    perform_installation
 }
 
-# Function to copy templates with version checking
-copy_templates() {
-    local source_dir="$1/templates"
-    local target_dir="$2/templates"
+# Perform the actual installation
+perform_installation() {
+    print_color "📦 Installing $BUNDLE_NAME..." "$CYAN"
 
-    echo -e "${BLUE}Installing templates...${NC}"
-    create_directory "$target_dir"
+    # Create directories
+    mkdir -p "$TARGET_DIR/agents"
+    [[ ${#TEMPLATES[@]} -gt 0 ]] && mkdir -p "$TARGET_DIR/templates"
 
-    # Count templates for progress feedback
-    local template_count=$(find "$source_dir" -name "*.md" -type f | wc -l)
-    echo -e "${YELLOW}Found $template_count templates to install${NC}"
-
-    local updated_count=0
-    local skipped_count=0
-
-    # Copy each template file with version awareness
-    for template_file in "$source_dir"/*.md; do
-        if [[ -f "$template_file" ]]; then
-            local template_name=$(basename "$template_file")
-            local target_file="$target_dir/$template_name"
-            local status=$(compare_file_versions "$template_file" "$target_file")
-
-            case "$status" in
-                "new")
-                    echo -e "  ${GREEN}+ Installing new template: $template_name${NC}"
-                    cp "$template_file" "$target_dir/"
-                    updated_count=$((updated_count + 1))
-                    ;;
-                "newer")
-                    echo -e "  ${YELLOW}↑ Updating template: $template_name${NC}"
-                    cp "$template_file" "$target_dir/"
-                    updated_count=$((updated_count + 1))
-                    ;;
-                "older")
-                    if [[ "$FORCE_INSTALL" == true ]]; then
-                        echo -e "  ${RED}⚠ Force overwriting newer template: $template_name${NC}"
-                        cp "$template_file" "$target_dir/"
-                        updated_count=$((updated_count + 1))
-                    else
-                        echo -e "  ${RED}⚠ Skipping older template: $template_name (target is newer)${NC}"
-                        skipped_count=$((skipped_count + 1))
-                    fi
-                    ;;
-                "same")
-                    echo -e "  ${GREEN}= Template up to date: $template_name${NC}"
-                    skipped_count=$((skipped_count + 1))
-                    ;;
-            esac
-        fi
+    # Install agents
+    for agent_info in "${AGENTS[@]}"; do
+        IFS=':' read -r agent_name agent_desc <<< "$agent_info"
+        print_color "  → Installing $agent_name" "$GREEN"
+        cp "$BUNDLE_DIR/agents/${agent_name}.md" "$TARGET_DIR/agents/"
     done
 
-    echo -e "${GREEN}Templates processing complete! Updated: $updated_count, Skipped: $skipped_count${NC}"
+    # Install templates
+    if [[ ${#TEMPLATES[@]} -gt 0 ]]; then
+        for template in "${TEMPLATES[@]}"; do
+            print_color "  → Installing template: $template" "$GREEN"
+            cp "$BUNDLE_DIR/templates/$template" "$TARGET_DIR/templates/"
+        done
+    fi
+
+    print_color "✅ Installation complete!" "$GREEN"
+    display_bundle_info
 }
 
-# Function to create TODO documentation directories
-create_todo_structure() {
-    local target_dir="$1"
+# ============================================================================
+# MAIN SCRIPT LOGIC
+# ============================================================================
 
-    echo -e "${BLUE}Creating TODO documentation structure...${NC}"
+# Parse command line arguments
+MODE="install"
+TARGET_MODE=""
+FORCE=false
+VERBOSE=false
 
-    # Create docs/todos directory structure
-    local docs_dir="$target_dir/docs"
-    local todos_dir="$docs_dir/todos"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --global|-g)
+            TARGET_MODE="global"
+            shift
+            ;;
+        --project|-p)
+            TARGET_MODE="project"
+            shift
+            ;;
+        --sync-back)
+            MODE="sync"
+            shift
+            ;;
+        --check-versions)
+            MODE="check"
+            shift
+            ;;
+        --force|-f)
+            FORCE=true
+            shift
+            ;;
+        --verbose|-v)
+            VERBOSE=true
+            shift
+            ;;
+        --help|-h)
+            cat << EOF
+Usage: $0 [OPTIONS]
 
-    create_directory "$docs_dir"
-    create_directory "$todos_dir"
+Options:
+  --global, -g         Install globally to ~/.claude
+  --project, -p        Install to current project .claude
+  --sync-back          Sync changes from installed back to bundle
+  --check-versions     Check version status without changes
+  --force, -f          Force operation without confirmations
+  --verbose, -v        Show detailed output
+  --help, -h           Show this help message
 
-    # Create basic README for docs structure
-    cat > "$docs_dir/README.md" << 'EOF'
-# Agent Builder Documentation
-
-This directory contains documentation and TODO tracking for the Agent Builder system.
-
-## Structure
-
-- `todos/` - TODO documents and workflow tracking
-- Additional documentation files as needed
-
-## Usage
-
-The Agent Builder system automatically creates TODO documents in the `todos/` directory
-to track complex operations and multi-phase workflows.
+Examples:
+  $0 --global              # Install globally
+  $0 --check-versions      # Check version status
+  $0 --sync-back           # Update bundle from installed
+  $0 --global --force      # Force global install
 EOF
-
-    echo -e "${GREEN}TODO documentation structure created!${NC}"
-}
-
-# Function to validate installation
-validate_installation() {
-    local target_dir="$1"
-    local errors=0
-
-    echo -e "${BLUE}Validating installation...${NC}"
-
-    # Check if agents directory exists and has files
-    if [[ ! -d "$target_dir/agents" ]] || [[ -z "$(ls -A "$target_dir/agents" 2>/dev/null)" ]]; then
-        echo -e "${RED}✗ Agents directory missing or empty${NC}"
-        errors=$((errors + 1))
-    else
-        local agent_count=$(ls "$target_dir/agents"/*.md 2>/dev/null | wc -l)
-        echo -e "${GREEN}✓ Agents directory: $agent_count agents installed${NC}"
-    fi
-
-    # Check if templates directory exists and has files
-    if [[ ! -d "$target_dir/templates" ]] || [[ -z "$(ls -A "$target_dir/templates" 2>/dev/null)" ]]; then
-        echo -e "${RED}✗ Templates directory missing or empty${NC}"
-        errors=$((errors + 1))
-    else
-        local template_count=$(ls "$target_dir/templates"/*.md 2>/dev/null | wc -l)
-        echo -e "${GREEN}✓ Templates directory: $template_count templates installed${NC}"
-    fi
-
-    # Check if docs/todos structure exists
-    if [[ ! -d "$target_dir/docs/todos" ]]; then
-        echo -e "${RED}✗ TODO documentation structure missing${NC}"
-        errors=$((errors + 1))
-    else
-        echo -e "${GREEN}✓ TODO documentation structure created${NC}"
-    fi
-
-    return $errors
-}
-
-# Main installation function
-main() {
-    # Get the script's directory (source directory)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    # Verify we're in the Agent Builder directory
-    if [[ ! -d "$SCRIPT_DIR/.claude/agents" ]]; then
-        echo -e "${RED}Error: This script must be run from the Agent Builder directory${NC}"
-        echo -e "${RED}Could not find .claude/agents/ in: $SCRIPT_DIR${NC}"
-        exit 1
-    fi
-
-    # Handle check-versions mode
-    if [[ "$CHECK_VERSIONS" == true ]]; then
-        # Prompt for installation mode if not specified (needed for target directory)
-        prompt_install_mode
-        TARGET_DIR=$(get_target_directory)
-
-        echo -e "${BLUE}Agent Builder Version Check${NC}"
-        echo -e "${YELLOW}Installation mode: $INSTALL_MODE${NC}"
-        echo ""
-
-        check_all_versions "$SCRIPT_DIR" "$TARGET_DIR"
-
-        if [[ $? -eq 0 ]]; then
-            echo ""
-            echo -e "${GREEN}Version check completed. No conflicts detected.${NC}"
-            echo -e "${YELLOW}Run without --check-versions to proceed with installation.${NC}"
-        else
-            echo ""
-            echo -e "${RED}Version conflicts detected. Use --force to override warnings.${NC}"
-        fi
-        return
-    fi
-
-    # Prompt for installation mode if not specified
-    prompt_install_mode
-
-    # Get target directory
-    TARGET_DIR=$(get_target_directory)
-
-    echo -e "${BLUE}Agent Builder Installation${NC}"
-    echo -e "${YELLOW}Installation mode: $INSTALL_MODE${NC}"
-    echo -e "${YELLOW}Target directory: $TARGET_DIR${NC}"
-
-    if [[ "$FORCE_INSTALL" == true ]]; then
-        echo -e "${YELLOW}Force mode: ON (will override version warnings)${NC}"
-    fi
-    echo ""
-
-    # Check for version conflicts before installation (unless forced)
-    if [[ "$FORCE_INSTALL" != true ]]; then
-        echo -e "${BLUE}Checking for version conflicts...${NC}"
-        if ! check_all_versions "$SCRIPT_DIR" "$TARGET_DIR"; then
-            echo ""
-            echo -e "${RED}Installation cancelled due to version conflicts.${NC}"
-            echo -e "${YELLOW}Options:${NC}"
-            echo -e "  1. Use --force to override warnings and install anyway"
-            echo -e "  2. Use --check-versions to see detailed comparison"
-            echo -e "  3. Update your source files to match or exceed installed versions"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
             exit 1
-        fi
-        echo ""
-    fi
+            ;;
+    esac
+done
 
-    # Create target directory if it doesn't exist
-    create_directory "$TARGET_DIR"
+# Determine target directory if not set
+if [[ -z "$TARGET_MODE" ]]; then
+    if [[ "$MODE" != "check" ]]; then
+        echo "Select installation target:"
+        echo "1) Global (~/.claude)"
+        echo "2) Project (./.claude)"
+        read -p "Choice [1-2]: " choice
 
-    # Copy agents from source
-    copy_agents "$SCRIPT_DIR" "$TARGET_DIR"
-    echo ""
-
-    # Copy templates from source
-    copy_templates "$SCRIPT_DIR" "$TARGET_DIR"
-    echo ""
-
-    # Create TODO documentation structure
-    create_todo_structure "$TARGET_DIR"
-    echo ""
-
-    # Validate installation
-    if validate_installation "$TARGET_DIR"; then
-        echo -e "${GREEN}Installation completed successfully!${NC}"
-        echo ""
-        echo -e "${BLUE}What's installed:${NC}"
-        echo -e "• Agent Builder system agents"
-        echo -e "• Agent and template files"
-        echo -e "• TODO documentation structure"
-        echo ""
-        echo -e "${BLUE}Usage:${NC}"
-        echo -e "To create a new agent, simply say:"
-        echo -e "\"I want to create an agent for [specific purpose]\""
-        echo ""
-        echo -e "The agent-builder will automatically activate and guide you through"
-        echo -e "a structured creation process."
-        echo ""
-        echo -e "${BLUE}Version Management:${NC}"
-        echo -e "• Use --check-versions to compare file versions before installing"
-        echo -e "• Use --force to override version warnings"
+        case "$choice" in
+            1) TARGET_MODE="global" ;;
+            2) TARGET_MODE="project" ;;
+            *) echo "Invalid choice"; exit 1 ;;
+        esac
     else
-        echo -e "${RED}Installation completed with errors. Please check the output above.${NC}"
-        exit 1
+        TARGET_MODE="global"  # Default for check mode
     fi
-}
+fi
 
-# Run main function
-main "$@"
+# Set target directory
+if [[ "$TARGET_MODE" == "global" ]]; then
+    TARGET_DIR="$HOME/.claude"
+else
+    TARGET_DIR="$(pwd)/.claude"
+fi
+
+# Execute based on mode
+case "$MODE" in
+    "sync")
+        sync_back_to_bundle
+        ;;
+    "check")
+        check_versions
+        ;;
+    "install")
+        install_with_check "$FORCE"
+        ;;
+esac
