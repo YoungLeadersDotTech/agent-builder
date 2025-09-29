@@ -161,11 +161,6 @@ This bundle README covers:
 - **2.0.0**: Complete bundle architecture with smart installer
 - **1.0.0**: Initial release
 
-## Related Documentation
-
-For complete Agent Builder documentation, see the main project README at:
-https://github.toasttab.com/johnconneely-toast/agent-builder
-
 ## Support
 
 This bundle is part of the Agent Builder toolkit. For issues or improvements:
